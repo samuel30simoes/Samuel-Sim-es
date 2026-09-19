@@ -3,7 +3,12 @@ name: DevSecOps Pipeline
 on:
   push:
     branches: [ "main" ]
-  workflow_dispatch:
+  pull_request:
+    branches: [ "main" ]
+
+permissions:
+  contents: read
+  security-events: write
 
 jobs:
   secret-scanning:
@@ -13,14 +18,16 @@ jobs:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
+
       - uses: gitleaks/gitleaks-action@v2
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         continue-on-error: true
-      # PASSO A ADICIONAR:
+
       - name: Upload Gitleaks SARIF
         uses: github/codeql-action/upload-sarif@v3
         if: always()
+        continue-on-error: true
         with:
           sarif_file: 'gitleaks-results.sarif'
 
@@ -29,12 +36,14 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+
       - run: npx semgrep scan --config auto --sarif --output semgrep.sarif
         continue-on-error: true
-      # PASSO A ADICIONAR:
+
       - name: Upload Semgrep SARIF
         uses: github/codeql-action/upload-sarif@v3
         if: always()
+        continue-on-error: true
         with:
           sarif_file: 'semgrep.sarif'
 
@@ -43,18 +52,21 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+
       - uses: aquasecurity/trivy-action@master
         with:
           scan-type: 'fs'
           format: 'sarif'
           output: 'trivy-results.sarif'
         continue-on-error: true
-      # PASSO A ADICIONAR:
+
       - name: Upload Trivy SARIF
         uses: github/codeql-action/upload-sarif@v3
         if: always()
+        continue-on-error: true
         with:
           sarif_file: 'trivy-results.sarif'
+
   dast:
     name: DAST (OWASP ZAP)
     runs-on: ubuntu-latest
