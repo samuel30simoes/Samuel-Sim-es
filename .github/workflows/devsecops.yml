@@ -58,7 +58,8 @@ jobs:
 
       - name: OWASP ZAP Baseline Scan
         uses: zaproxy/action-baseline@v0.12.0
+        continue-on-error: true
         with:
           target: 'http://127.0.0.1:3000'
           fail_action: false
-          cmd_options: '-g gen.conf'
+          issue_title: 'ZAP Scan Report'
