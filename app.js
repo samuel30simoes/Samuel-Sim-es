@@ -27,7 +27,10 @@ app.get('/', (req, res) => {
 app.listen(3000);
 
 const express = require('express');
-const helmet = require('helmet');
+const helmet = require('helmet'); // 1. Importar a biblioteca
 
 const app = express();
-app.use(helmet());
+
+app.use(helmet()); // 2. Ativar os cabeçalhos de segurança HTTP
+
+// As tuas rotas existentes mantêm-se abaixo...
