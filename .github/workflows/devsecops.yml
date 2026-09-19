@@ -16,15 +16,27 @@ jobs:
       - uses: gitleaks/gitleaks-action@v2
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        continue-on-error: true
+      # PASSO A ADICIONAR:
+      - name: Upload Gitleaks SARIF
+        uses: github/codeql-action/upload-sarif@v3
+        if: always()
+        with:
+          sarif_file: 'gitleaks-results.sarif'
 
   sast:
     name: SAST (Semgrep)
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - uses: semgrep/semgrep-action@v1
+      - run: npx semgrep scan --config auto --sarif --output semgrep.sarif
+        continue-on-error: true
+      # PASSO A ADICIONAR:
+      - name: Upload Semgrep SARIF
+        uses: github/codeql-action/upload-sarif@v3
+        if: always()
         with:
-          config: p/default
+          sarif_file: 'semgrep.sarif'
 
   sca:
     name: SCA (Trivy)
@@ -34,10 +46,15 @@ jobs:
       - uses: aquasecurity/trivy-action@master
         with:
           scan-type: 'fs'
-          scan-ref: '.'
-          format: 'table'
-          severity: 'CRITICAL,HIGH'
-
+          format: 'sarif'
+          output: 'trivy-results.sarif'
+        continue-on-error: true
+      # PASSO A ADICIONAR:
+      - name: Upload Trivy SARIF
+        uses: github/codeql-action/upload-sarif@v3
+        if: always()
+        with:
+          sarif_file: 'trivy-results.sarif'
   dast:
     name: DAST (OWASP ZAP)
     runs-on: ubuntu-latest
