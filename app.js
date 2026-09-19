@@ -17,6 +17,8 @@ app.get('/', (req, res) => {
   res.json({ message: "API segura operacional" });
 });
 
+const PORT = process.env.PORT || 3000;
+
 app.listen(PORT, () => {
   console.log(`Servidor a correr na porta ${PORT}`);
 });
