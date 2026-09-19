@@ -1,8 +1,17 @@
 const express = require('express');
-const app = express();
-const PORT = process.env.PORT || 3000;
+const helmet = require('helmet');
 
-app.use(express.json());
+const app = express();
+
+// IMPORTANTE: Deve ficar ANTES de qualquer rota
+app.use(helmet());
+
+// Rotas abaixo
+app.get('/', (req, res) => {
+  res.send('API a funcionar!');
+});
+
+app.listen(3000, () => console.log('Server running on port 3000'));
 
 app.get('/', (req, res) => {
   res.json({ message: "API segura operacional" });
@@ -25,12 +34,3 @@ app.get('/', (req, res) => {
 });
 
 app.listen(3000);
-
-const express = require('express');
-const helmet = require('helmet'); // 1. Importar a biblioteca
-
-const app = express();
-
-app.use(helmet()); // 2. Ativar os cabeçalhos de segurança HTTP
-
-// As tuas rotas existentes mantêm-se abaixo...
